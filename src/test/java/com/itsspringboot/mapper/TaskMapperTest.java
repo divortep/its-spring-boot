@@ -18,7 +18,7 @@ public class TaskMapperTest {
   private TaskMapper taskMapper;
 
   @Before
-  void setUp() {
+  public void setUp() {
     taskMapper = new TaskMapper();
   }
 

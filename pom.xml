@@ -9,10 +9,10 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com</groupId>
-  <artifactId>ikea-scraper-app</artifactId>
+  <artifactId>its-spring-boot-app</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>ikea-scraper-app</name>
-  <description>App scraping IKEA tasks</description>
+  <name>its-spring-boot-app</name>
+  <description>IKEA tasks scrapper</description>
 
   <properties>
     <java.version>12</java.version>
@@ -70,6 +70,12 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>6.1</version>
     </dependency>
 
     <dependency>
@@ -156,6 +162,21 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <!-- Heroku Maven Plugin Configuration -->
+      <plugin>
+        <groupId>com.heroku.sdk</groupId>
+        <artifactId>heroku-maven-plugin</artifactId>
+        <version>2.0.10</version>
+        <configuration>
+          <appName>its-spring-boot-app</appName>
+          <includeTarget>false</includeTarget>
+          <includes>
+            <include>${project.build.directory}/${project.build.finalName}.jar</include>
+          </includes>
+          <jdkVersion>${java.version}</jdkVersion>
+        </configuration>
       </plugin>
     </plugins>
   </build>
