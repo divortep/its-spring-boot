@@ -3,6 +3,7 @@ package com.itsspringboot.model;
 import com.google.common.collect.ImmutableList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -13,7 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "tasks")
 @Getter()
-@EqualsAndHashCode
 @ToString
 public class Task {
 
@@ -62,5 +62,27 @@ public class Task {
 
   private boolean hasPax(List<String> items) {
     return items.stream().anyMatch(item -> item.contains("PAX"));
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final Task task = (Task) o;
+    return Objects.equals(number, task.number) &&
+        Objects.equals(date, task.date) &&
+        Objects.equals(timeSlot, task.timeSlot) &&
+        Objects.equals(address, task.address) &&
+        Objects.equals(quotedTime, task.quotedTime) &&
+        Objects.equals(items, task.items);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(number, date, timeSlot, address, quotedTime, items);
   }
 }
