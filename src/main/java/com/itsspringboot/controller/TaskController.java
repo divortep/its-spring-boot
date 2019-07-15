@@ -5,7 +5,6 @@ import com.itsspringboot.model.Task;
 import com.itsspringboot.service.TaskService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,15 +31,15 @@ public class TaskController {
 
   @GetMapping("/acceptedTasks")
   @ResponseBody
-  public List<AcceptedTask> getAcceptedTasks() {
+  public List<AcceptedTask> acceptTask() {
     return taskService.getAcceptedTasks();
   }
 
   @GetMapping("/task/{taskId}/accept")
   @ResponseBody
-  public AcceptedTask getAcceptedTasks(@PathVariable String taskId,
-                                       @RequestParam(required = false) String teammate) {
-    return taskService.acceptTask(taskId, teammate);
+  public AcceptedTask acceptTask(@PathVariable String taskId,
+                                 @RequestParam(required = false) boolean withTeammate) {
+    return taskService.acceptTask(taskId, withTeammate);
   }
 
 }

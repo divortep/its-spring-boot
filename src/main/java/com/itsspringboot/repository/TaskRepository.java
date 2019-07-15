@@ -13,7 +13,7 @@ public interface TaskRepository {
 
   List<AcceptedTask> getAcceptedTasks();
 
-  AcceptedTask acceptTask(Task task, String teammate);
+  AcceptedTask acceptTask(Task task, boolean withTeammate);
 
   Optional<Task> save(Task task);
 

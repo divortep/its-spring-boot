@@ -2,7 +2,6 @@ package com.itsspringboot.model;
 
 import java.util.Date;
 import java.util.Objects;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,16 +12,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AcceptedTask extends Task {
 
   private Date acceptedDate;
-  private String teammate;
+  private boolean withTeammate;
 
   protected AcceptedTask() {
     super();
   }
 
-  public AcceptedTask(Task task, Date acceptedDate, String teammate) {
+  public AcceptedTask(Task task, Date acceptedDate, boolean withTeammate) {
     super(task);
     this.acceptedDate = acceptedDate;
-    this.teammate = teammate;
+    this.withTeammate = withTeammate;
   }
 
   @Override
@@ -38,12 +37,12 @@ public class AcceptedTask extends Task {
     }
     final AcceptedTask that = (AcceptedTask) o;
     return Objects.equals(acceptedDate, that.acceptedDate) &&
-        Objects.equals(teammate, that.teammate);
+        Objects.equals(withTeammate, that.withTeammate);
   }
 
   @Override
   public int hashCode() {
 
-    return Objects.hash(super.hashCode(), acceptedDate, teammate);
+    return Objects.hash(super.hashCode(), acceptedDate, withTeammate);
   }
 }

@@ -21,11 +21,14 @@ public class TaskServiceTest {
 
   @Mock
   private TaskRepository taskRepository;
+  @Mock
+  private EmailNotificationService emailNotificationService;
+
   private TaskService taskService;
 
   @Before
   public void setUp() {
-    taskService = new TaskService(taskRepository);
+    taskService = new TaskService(taskRepository, emailNotificationService);
   }
 
   @Test
@@ -48,13 +51,13 @@ public class TaskServiceTest {
     assertEquals("id2", availableTasks.get(0).getId());
   }
 
-  @Test(expected=AppException.class)
+  @Test(expected = AppException.class)
   public void testAcceptTaskWithoutId() {
-    taskService.acceptTask(null, "");
+    taskService.acceptTask(null, false);
   }
 
-  @Test(expected=AppException.class)
+  @Test(expected = AppException.class)
   public void testAcceptTaskWithWrongId() {
-    taskService.acceptTask("id", "");
+    taskService.acceptTask("id", false);
   }
 }

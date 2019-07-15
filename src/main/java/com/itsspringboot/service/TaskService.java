@@ -10,16 +10,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
 
+  @Value("${its.teammate.email}")
+  private String teammateEmail;
+
   private TaskRepository taskRepository;
+  private EmailNotificationService emailNotificationService;
 
   @Autowired
-  public TaskService(TaskRepository taskRepository) {
+  public TaskService(TaskRepository taskRepository,
+                     EmailNotificationService emailNotificationService) {
     this.taskRepository = taskRepository;
+    this.emailNotificationService = emailNotificationService;
   }
 
   public List<Task> getAvailableTasks() {
@@ -33,7 +40,7 @@ public class TaskService {
     return taskRepository.getAcceptedTasks();
   }
 
-  public AcceptedTask acceptTask(String taskId, String teammate) {
+  public AcceptedTask acceptTask(String taskId, boolean withTeammate) {
     if (isEmpty(taskId)) {
       throw new AppException("Task id can't be empty");
     }
@@ -41,6 +48,7 @@ public class TaskService {
     Task task = taskRepository.getTask(taskId)
         .orElseThrow(() -> new AppException("Task not found with id: " + taskId));
 
-    return taskRepository.acceptTask(task, teammate);
+    emailNotificationService.notifyIKEA(task.getNumber(), withTeammate ? teammateEmail : "");
+    return taskRepository.acceptTask(task, withTeammate);
   }
 }

@@ -35,8 +35,8 @@ public class TaskRepositoryImpl implements TaskRepository {
   }
 
   @Override
-  public AcceptedTask acceptTask(Task task, String teammate) {
-    AcceptedTask acceptedTask = new AcceptedTask(task, new Date(), teammate);
+  public AcceptedTask acceptTask(Task task, boolean withTeammate) {
+    AcceptedTask acceptedTask = new AcceptedTask(task, new Date(), withTeammate);
     return mongoTemplate.save(acceptedTask);
   }
 

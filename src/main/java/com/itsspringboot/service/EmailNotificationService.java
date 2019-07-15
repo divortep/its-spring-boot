@@ -15,6 +15,9 @@ public class EmailNotificationService {
   @Value("${its.tasker.email}")
   private String taskerEmail;
 
+  @Value("${its.ikea.email}")
+  private String ikeaEmail;
+
   private JavaMailSender mailSender;
 
   @Autowired
@@ -23,14 +26,18 @@ public class EmailNotificationService {
   }
 
   public void notifyAdmin(String subject, String message) {
-    sendMassage(subject, message, adminEmail);
+    sendMessage(subject, message, adminEmail);
   }
 
   public void notifyTasker(String subject, String message) {
-    sendMassage(subject, message, taskerEmail);
+    sendMessage(subject, message, taskerEmail);
   }
 
-  private void sendMassage(String to, String subject, String message) {
+  public void notifyIKEA(String subject, String message) {
+    sendMessage(subject, message, ikeaEmail);
+  }
+
+  private void sendMessage(String to, String subject, String message) {
     SimpleMailMessage msg = new SimpleMailMessage();
     msg.setTo(to);
     msg.setSubject(subject);
