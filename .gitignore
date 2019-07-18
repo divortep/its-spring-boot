@@ -32,4 +32,4 @@
 .mvn
 /dbdata
 /mongo_data
-/src/main/resources/application-dev.properties
+**/application-local.properties

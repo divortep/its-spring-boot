@@ -51,6 +51,7 @@ public class Task {
 
   public Task(Task task) {
     this.id = task.getId();
+    this.createdDate = task.getCreatedDate();
     this.number = task.getNumber();
     this.date = task.getDate();
     this.timeSlot = task.getTimeSlot();

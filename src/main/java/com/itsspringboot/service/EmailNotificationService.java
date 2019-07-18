@@ -26,15 +26,15 @@ public class EmailNotificationService {
   }
 
   public void notifyAdmin(String subject, String message) {
-    sendMessage(subject, message, adminEmail);
+    sendMessage(adminEmail, subject, message);
   }
 
   public void notifyTasker(String subject, String message) {
-    sendMessage(subject, message, taskerEmail);
+    sendMessage(taskerEmail, subject, message);
   }
 
   public void notifyIKEA(String subject, String message) {
-    sendMessage(subject, message, ikeaEmail);
+    sendMessage(ikeaEmail, subject, message);
   }
 
   private void sendMessage(String to, String subject, String message) {
