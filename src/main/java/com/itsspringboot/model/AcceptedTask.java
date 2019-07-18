@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 public class AcceptedTask extends Task {
 
-  private Date acceptedDate;
-  private boolean withTeammate;
+  protected Date acceptedDate;
+  protected boolean withTeammate;
 
   protected AcceptedTask() {
     super();

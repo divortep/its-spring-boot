@@ -18,18 +18,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Task {
 
   @CreatedDate
-  public Date createdDate;
+  protected Date createdDate;
 
   @Id
-  private String id;
+  protected String id;
 
-  private String number;
-  private String date;
-  private String timeSlot;
-  private String address;
-  private String quotedTime;
-  private boolean hasPAX;
-  private List<String> items = ImmutableList.of();
+  protected String number;
+  protected String date;
+  protected String timeSlot;
+  protected String address;
+  protected String quotedTime;
+  protected boolean hasPAX;
+  protected List<String> items = ImmutableList.of();
 
   protected Task() {
   }
