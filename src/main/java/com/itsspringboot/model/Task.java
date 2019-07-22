@@ -1,15 +1,15 @@
 package com.itsspringboot.model;
 
+import static java.util.stream.Collectors.joining;
+
 import com.google.common.collect.ImmutableList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "tasks")
@@ -63,6 +63,16 @@ public class Task {
 
   private boolean hasPax(List<String> items) {
     return items.stream().anyMatch(item -> item.contains("PAX"));
+  }
+
+  public String getRepr() {
+    return number + "\n" +
+        date + "\n" +
+        "Time slot: " + timeSlot + "\n" +
+        "Address: " + address + "\n" +
+        "Quoted Time: " + quotedTime + "\n" +
+        "To assemble: " + "\n" +
+        items.stream().collect(joining("\n"));
   }
 
   @Override

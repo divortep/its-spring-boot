@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
 
-  @Value("${its.teammate.email}")
-  private String teammateEmail;
+  @Value("${its.teammate.name}")
+  private String teammateName;
 
   private TaskRepository taskRepository;
   private EmailNotificationService emailNotificationService;
@@ -48,7 +48,7 @@ public class TaskService {
     Task task = taskRepository.getTask(taskId)
         .orElseThrow(() -> new AppException("Task not found with id: " + taskId));
 
-    emailNotificationService.notifyIKEA(task.getNumber(), withTeammate ? teammateEmail : "");
+    emailNotificationService.notifyIKEA(task.getNumber(), withTeammate ? teammateName : "");
     return taskRepository.acceptTask(task, withTeammate);
   }
 }
