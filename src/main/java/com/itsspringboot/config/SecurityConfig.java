@@ -1,9 +1,11 @@
 package com.itsspringboot.config;
 
+import com.itsspringboot.security.AESPasswordEncoder;
 import com.itsspringboot.security.JwtAuthenticationEntryPoint;
 import com.itsspringboot.security.JwtAuthenticationFilter;
 import com.itsspringboot.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,7 +16,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,6 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Value("${aes.key}")
+  private String aesKey;
 
   private CustomUserDetailsService customUserDetailsService;
   private JwtAuthenticationEntryPoint unauthorizedHandler;
@@ -40,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    return new AESPasswordEncoder(aesKey);
   }
 
   @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -63,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .authorizeRequests()
         .antMatchers("/auth/login").permitAll()
-        .antMatchers("/auth/encode").permitAll()
+        .antMatchers("/system/latestClientVersion").permitAll()
         .antMatchers("/",
             "/favicon.ico",
             "/**/*.png",

@@ -4,29 +4,31 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import com.itsspringboot.exception.AppException;
 import com.itsspringboot.model.AcceptedTask;
+import com.itsspringboot.model.Performer;
 import com.itsspringboot.model.Task;
+import com.itsspringboot.model.User;
+import com.itsspringboot.model.UserSettings;
 import com.itsspringboot.repository.TaskRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
 
-  @Value("${its.teammate.name}")
-  private String teammateName;
-
   private TaskRepository taskRepository;
   private EmailNotificationService emailNotificationService;
+  private UserService userService;
 
   @Autowired
-  public TaskService(TaskRepository taskRepository,
-                     EmailNotificationService emailNotificationService) {
+  public TaskService(final TaskRepository taskRepository, final EmailNotificationService emailNotificationService,
+                     final UserService userService) {
     this.taskRepository = taskRepository;
     this.emailNotificationService = emailNotificationService;
+    this.userService = userService;
   }
 
   public List<Task> getAvailableTasks() {
@@ -36,19 +38,39 @@ public class TaskService {
     return tasks.stream().filter(task -> !acceptedTasksIds.contains(task.getId())).collect(Collectors.toList());
   }
 
-  public List<AcceptedTask> getAcceptedTasks() {
-    return taskRepository.getAcceptedTasks();
+  public List<AcceptedTask> getAcceptedByMeOrWithMeTasks() {
+    return taskRepository.getAcceptedByMeOrWithMeTasks();
   }
 
-  public AcceptedTask acceptTask(String taskId, boolean withTeammate) {
+  public AcceptedTask acceptTask(final String taskId, final boolean withTeammate) {
     if (isEmpty(taskId)) {
       throw new AppException("Task id can't be empty");
     }
 
-    Task task = taskRepository.getTask(taskId)
-        .orElseThrow(() -> new AppException("Task not found with id: " + taskId));
+    final User user = userService.getCurrentUser()
+        .orElseThrow(() -> new AppException("Task can't be accepted anonymously."));
+
+    final Performer acceptedBy = new Performer(user);
+    final Performer teammate = Optional.ofNullable(user.getSettings())
+        .map(UserSettings::getTeammate)
+        .orElse(null);
+
+    final String teammateName = teammate != null && teammate.getName() != null ? teammate.getName() : "";
+    final Task task = taskRepository.getTask(taskId)
+        .orElseThrow(() -> new AppException("Task can't be found with id: " + taskId));
 
     emailNotificationService.notifyIKEA(task.getNumber(), withTeammate ? teammateName : "");
-    return taskRepository.acceptTask(task, withTeammate);
+    return taskRepository.acceptTask(task, acceptedBy, withTeammate ? teammate : null);
+  }
+
+  public AcceptedTask markTaskDone(final String taskId) {
+    if (isEmpty(taskId)) {
+      throw new AppException("Task id can't be empty");
+    }
+
+    final AcceptedTask acceptedTask = taskRepository.getAcceptedTask(taskId)
+        .orElseThrow(() -> new AppException("Accepted task can't be found with id: " + taskId));
+
+    return taskRepository.markTaskDone(acceptedTask);
   }
 }

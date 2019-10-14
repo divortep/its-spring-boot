@@ -28,7 +28,6 @@ public class Task {
   protected String timeSlot;
   protected String address;
   protected String quotedTime;
-  protected boolean hasPAX;
   protected List<String> items = ImmutableList.of();
 
   protected Task() {
@@ -46,7 +45,6 @@ public class Task {
     this.address = address;
     this.quotedTime = quotedTime;
     this.items = items;
-    this.hasPAX = hasPax(items);
   }
 
   public Task(Task task) {
@@ -58,7 +56,6 @@ public class Task {
     this.address = task.getAddress();
     this.quotedTime = task.getQuotedTime();
     this.items = task.getItems();
-    this.hasPAX = task.hasPAX;
   }
 
   private boolean hasPax(List<String> items) {

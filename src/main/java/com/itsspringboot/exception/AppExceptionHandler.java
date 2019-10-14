@@ -22,7 +22,7 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     this.emailNotificationService = emailNotificationService;
   }
 
-  @ExceptionHandler(Exception.class)
+  @ExceptionHandler(AppException.class)
   protected void handleException(RuntimeException ex, WebRequest request) {
     final StringWriter stacktrace = new StringWriter();
     ex.printStackTrace(new PrintWriter(stacktrace));

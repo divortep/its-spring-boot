@@ -1,32 +1,52 @@
 package com.itsspringboot.repository.impl;
 
+import static java.util.Collections.unmodifiableList;
+
 import com.itsspringboot.model.AcceptedTask;
+import com.itsspringboot.model.Performer;
 import com.itsspringboot.model.Task;
+import com.itsspringboot.model.User;
 import com.itsspringboot.repository.TaskRepository;
+import com.itsspringboot.service.UserService;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class TaskRepositoryImpl implements TaskRepository {
 
   private MongoTemplate mongoTemplate;
+  private UserService userService;
 
-  public TaskRepositoryImpl(MongoTemplate mongoTemplate) {
+  @Autowired
+  public void setMongoTemplate(final MongoTemplate mongoTemplate) {
     this.mongoTemplate = mongoTemplate;
   }
 
+  @Autowired
+  public void setUserService(final UserService userService) {
+    this.userService = userService;
+  }
+
   @Override
-  public Optional<Task> getTask(String taskId) {
+  public Optional<Task> getTask(final String taskId) {
     return Optional.ofNullable(mongoTemplate.findById(taskId, Task.class));
   }
 
   @Override
+  public Optional<AcceptedTask> getAcceptedTask(final String taskId) {
+    return Optional.ofNullable(mongoTemplate.findById(taskId, AcceptedTask.class));
+  }
+
+  @Override
   public List<Task> getTasks() {
-    return Collections.unmodifiableList(mongoTemplate.findAll(Task.class));
+    return unmodifiableList(mongoTemplate.findAll(Task.class));
   }
 
   @Override
@@ -35,31 +55,51 @@ public class TaskRepositoryImpl implements TaskRepository {
   }
 
   @Override
-  public AcceptedTask acceptTask(Task task, boolean withTeammate) {
-    AcceptedTask acceptedTask = new AcceptedTask(task, new Date(), withTeammate);
+  public List<AcceptedTask> getAcceptedByMeOrWithMeTasks() {
+    final String currentUserId = userService.getCurrentUser()
+        .map(User::getId)
+        .orElse("");
+
+    final Query query = new Query().addCriteria(
+        new Criteria().orOperator(
+            Criteria.where("acceptedBy.id").is(currentUserId),
+            Criteria.where("teammate.id").is(currentUserId)
+        )
+    );
+    return Collections.unmodifiableList(mongoTemplate.find(query, AcceptedTask.class));
+  }
+
+  @Override
+  public AcceptedTask acceptTask(final Task task, final Performer acceptedBy, final Performer teammate) {
+    AcceptedTask acceptedTask = new AcceptedTask(task, new Date(), acceptedBy, teammate, false);
     return mongoTemplate.save(acceptedTask);
   }
 
   @Override
-  public Optional<Task> save(Task task) {
+  public AcceptedTask markTaskDone(final AcceptedTask acceptedTask) {
+    return mongoTemplate.save(new AcceptedTask(acceptedTask, true));
+  }
+
+  @Override
+  public Optional<Task> save(final Task task) {
     return Optional.ofNullable(mongoTemplate.save(task));
   }
 
   @Override
-  public List<Task> saveAll(List<Task> tasks) {
+  public List<Task> saveAll(final List<Task> tasks) {
     tasks.stream()
         .map(Task::new)
         .forEach(mongoTemplate::save);
-    return Collections.unmodifiableList(tasks);
+    return unmodifiableList(tasks);
   }
 
   @Override
-  public void remove(Task task) {
+  public void remove(final Task task) {
     mongoTemplate.remove(task);
   }
 
   @Override
-  public void removeAll(List<Task> tasks) {
+  public void removeAll(final List<Task> tasks) {
     tasks.stream()
         .map(Task::new)
         .forEach(mongoTemplate::remove);

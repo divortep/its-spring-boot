@@ -30,7 +30,7 @@ public class TaskController {
   @GetMapping("/acceptedTasks")
   @ResponseBody
   public List<AcceptedTask> acceptTask() {
-    return taskService.getAcceptedTasks();
+    return taskService.getAcceptedByMeOrWithMeTasks();
   }
 
   @GetMapping("/task/{taskId}/accept")
@@ -40,4 +40,9 @@ public class TaskController {
     return taskService.acceptTask(taskId, withTeammate);
   }
 
+  @GetMapping("/task/{taskId}/done")
+  @ResponseBody
+  public AcceptedTask acceptTask(@PathVariable String taskId) {
+    return taskService.markTaskDone(taskId);
+  }
 }

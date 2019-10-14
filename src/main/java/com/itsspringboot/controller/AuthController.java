@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.itsspringboot.exception.AppException;
 import com.itsspringboot.model.Role;
 import com.itsspringboot.model.User;
+import com.itsspringboot.model.UserSettings;
 import com.itsspringboot.payload.ApiResponse;
 import com.itsspringboot.payload.JwtAuthResponse;
 import com.itsspringboot.payload.LoginRequest;
@@ -56,12 +57,12 @@ public class AuthController {
     return ResponseEntity.ok(new JwtAuthResponse(jwt));
   }
 
-  @Secured("ADMIN")
+  @Secured("ROLE_ADMIN")
   @PostMapping("/register")
   public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody final RegisterRequest signUpRequest) {
     final String password = passwordEncoder.encode(signUpRequest.getPassword());
-    final User userToSave = new User(signUpRequest.getName(), signUpRequest.getUsername(),
-        signUpRequest.getEmail(), password, ImmutableList.of(Role.USER));
+    final User userToSave = new User(null, signUpRequest.getName(), signUpRequest.getUsername(),
+        signUpRequest.getEmail(), password, ImmutableList.of(Role.ROLE_USER), new UserSettings());
 
     userRepository.saveUser(userToSave)
         .orElseThrow(() -> new AppException("An error occurred while saving a user."));

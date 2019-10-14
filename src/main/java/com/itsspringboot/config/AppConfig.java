@@ -3,8 +3,8 @@ package com.itsspringboot.config;
 import com.google.common.collect.ImmutableList;
 import com.itsspringboot.model.Role;
 import com.itsspringboot.model.User;
+import com.itsspringboot.model.UserSettings;
 import com.itsspringboot.repository.UserRepository;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,8 +42,8 @@ public class AppConfig {
   private void createAdminUser() {
     final Optional<User> admin = userRepository.findByUsernameOrEmail("admin");
     if (!admin.isPresent()) {
-      final User adminUser = new User(adminUsername, adminUsername, adminEmail, adminDefaultPassword,
-          ImmutableList.of(Role.ADMIN));
+      final User adminUser = new User(null, adminUsername, adminUsername, adminEmail, adminDefaultPassword,
+          ImmutableList.of(Role.ROLE_ADMIN), new UserSettings());
       userRepository.saveUser(adminUser);
     }
   }

@@ -51,7 +51,8 @@ public class TaskLoader {
     taskRepository.removeAll(tasksToRemove);
 
     if (CollectionUtils.isNotEmpty(tasksToSave)) {
-      fcmNotificationService.notify("New Ikea tasks have been added.", "");
+      final String newTasksNumbers = tasksToSave.stream().map(Task::getNumber).collect(joining(", "));
+      fcmNotificationService.notify("New tasks have been added.", newTasksNumbers);
     }
 
     if (CollectionUtils.isNotEmpty(tasksToSave) && newTasksEmailNotification) {

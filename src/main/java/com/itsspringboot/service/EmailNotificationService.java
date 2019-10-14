@@ -1,5 +1,6 @@
 package com.itsspringboot.service;
 
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,30 +19,31 @@ public class EmailNotificationService {
   @Value("${its.ikea.email}")
   private String ikeaEmail;
 
-  private JavaMailSender mailSender;
+  private Supplier<JavaMailSender> javaMailSenderFactory;
 
   @Autowired
-  public EmailNotificationService(JavaMailSender mailSender) {
-    this.mailSender = mailSender;
+  public void setJavaMailSenderFactory(
+      final Supplier<JavaMailSender> javaMailSenderFactory) {
+    this.javaMailSenderFactory = javaMailSenderFactory;
   }
 
   public void notifyAdmin(String subject, String message) {
     sendMessage(adminEmail, subject, message);
   }
 
-  public void notifyTasker(String subject, String message) {
+  public void notifyTasker(final String subject, final String message) {
     sendMessage(taskerEmail, subject, message);
   }
 
-  public void notifyIKEA(String subject, String message) {
+  public void notifyIKEA(final String subject, final String message) {
     sendMessage(ikeaEmail, subject, message);
   }
 
-  private void sendMessage(String to, String subject, String message) {
-    SimpleMailMessage msg = new SimpleMailMessage();
+  private void sendMessage(final String to, final String subject, final String message) {
+    final SimpleMailMessage msg = new SimpleMailMessage();
     msg.setTo(to);
     msg.setSubject(subject);
     msg.setText(message);
-    mailSender.send(msg);
+    javaMailSenderFactory.get().send(msg);
   }
 }

@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "users")
 @Getter()
@@ -21,29 +23,31 @@ public class User {
   private String name;
   private String username;
   private String email;
-
-  private List<Role> roles = ImmutableList.of();
+  private UserSettings settings;
+  private List<Role> roles;
 
   @JsonIgnore
   private String password;
 
-  public User() {
-  }
-
-  public User(final String name, final String username, final String email,
-              final String password, final ImmutableList<Role> roles) {
+  @PersistenceConstructor
+  public User(final String id, final String name, final String username, final String email,
+              final String password, final List<Role> roles, final UserSettings settings) {
+    this.id = id;
     this.name = name;
     this.email = email;
     this.username = username;
     this.password = password;
-    this.roles = roles;
+    this.roles = ImmutableList.copyOf(roles);
+    this.settings = new UserSettings(settings);
   }
 
   public User(User user) {
+    this.id = user.getId();
     this.name = user.getName();
     this.email = user.getEmail();
     this.username = user.getUsername();
     this.password = user.getPassword();
-    this.roles = user.roles;
+    this.roles = ImmutableList.copyOf(user.roles);
+    this.settings = new UserSettings(user.getSettings());
   }
 }
