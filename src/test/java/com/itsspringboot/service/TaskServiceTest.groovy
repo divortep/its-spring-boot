@@ -63,4 +63,30 @@ class TaskServiceTest extends Specification {
         AppException ex = thrown()
         ex.message.contains("Task can't be found with id")
     }
+
+    def "test notifyIKEA without teammate"() {
+        given:
+        def message
+
+        when:
+        taskService.notifyIKEA("tastid", new Performer(name: "name1", email: "email1"), null)
+
+        then:
+        1 * emailNotificationService.notifyIKEA(*_) >> { arguments -> message = arguments[1] }
+        message == "Me (email1) please."
+    }
+
+    def "test notifyIKEA with teammate"() {
+        given:
+        def message
+
+        when:
+        taskService.notifyIKEA("tastid",
+                new Performer(name: "name1", email: "email1"),
+                new Performer(name: "name2", email: "email2"))
+
+        then:
+        1 * emailNotificationService.notifyIKEA(*_) >> { arguments -> message = arguments[1] }
+        message == "Me (email1) and name2 (email2) please."
+    }
 }

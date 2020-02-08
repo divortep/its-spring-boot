@@ -42,7 +42,7 @@ public class AppConfig {
   private void createAdminUser() {
     final Optional<User> admin = userRepository.findByUsernameOrEmail("admin");
     if (!admin.isPresent()) {
-      final User adminUser = new User(null, adminUsername, adminUsername, adminEmail, adminDefaultPassword,
+      final User adminUser = new User(null, adminUsername, adminUsername, adminEmail, adminEmail, adminDefaultPassword,
           ImmutableList.of(Role.ROLE_ADMIN), new UserSettings());
       userRepository.saveUser(adminUser);
     }

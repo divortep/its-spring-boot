@@ -1,6 +1,7 @@
 package com.itsspringboot.service;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 
 import com.itsspringboot.exception.AppException;
 import com.itsspringboot.model.AcceptedTask;
@@ -55,12 +56,24 @@ public class TaskService {
         .map(UserSettings::getTeammate)
         .orElse(null);
 
-    final String teammateName = teammate != null && teammate.getName() != null ? teammate.getName() : "";
     final Task task = taskRepository.getTask(taskId)
         .orElseThrow(() -> new AppException("Task can't be found with id: " + taskId));
 
-    emailNotificationService.notifyIKEA(task.getNumber(), withTeammate ? teammateName : "");
+    notifyIKEA(task.getNumber(), acceptedBy, withTeammate && teammate != null ? teammate : null);
+
     return taskRepository.acceptTask(task, acceptedBy, withTeammate ? teammate : null);
+  }
+
+  private void notifyIKEA(final String taskNumber, final Performer acceptedBy, final Performer teammate) {
+    String message = "";
+    if (teammate != null && isNoneEmpty(teammate.getName())) {
+      message = String.format("Me (%s) and %s (%s) please.", acceptedBy.getEmail(), teammate.getName(), teammate.getEmail());
+
+    } else {
+      message = String.format("Me (%s) please.", acceptedBy.getEmail());
+    }
+
+    emailNotificationService.notifyIKEA(taskNumber, message);
   }
 
   public AcceptedTask markTaskDone(final String taskId) {

@@ -23,6 +23,7 @@ public class User {
   private String name;
   private String username;
   private String email;
+  private String personalEmail;
   private UserSettings settings;
   private List<Role> roles;
 
@@ -30,11 +31,12 @@ public class User {
   private String password;
 
   @PersistenceConstructor
-  public User(final String id, final String name, final String username, final String email,
+  public User(final String id, final String name, final String username, final String email, final String personalEmail,
               final String password, final List<Role> roles, final UserSettings settings) {
     this.id = id;
     this.name = name;
     this.email = email;
+    this.personalEmail = personalEmail;
     this.username = username;
     this.password = password;
     this.roles = ImmutableList.copyOf(roles);
@@ -45,6 +47,7 @@ public class User {
     this.id = user.getId();
     this.name = user.getName();
     this.email = user.getEmail();
+    this.personalEmail = user.getPersonalEmail();
     this.username = user.getUsername();
     this.password = user.getPassword();
     this.roles = ImmutableList.copyOf(user.roles);

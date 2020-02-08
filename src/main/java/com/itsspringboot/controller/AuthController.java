@@ -62,7 +62,8 @@ public class AuthController {
   public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody final RegisterRequest signUpRequest) {
     final String password = passwordEncoder.encode(signUpRequest.getPassword());
     final User userToSave = new User(null, signUpRequest.getName(), signUpRequest.getUsername(),
-        signUpRequest.getEmail(), password, ImmutableList.of(Role.ROLE_USER), new UserSettings());
+        signUpRequest.getEmail(), signUpRequest.getPersonalEmail(), password, ImmutableList.of(Role.ROLE_USER),
+        new UserSettings());
 
     userRepository.saveUser(userToSave)
         .orElseThrow(() -> new AppException("An error occurred while saving a user."));
