@@ -5,7 +5,9 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.ListUtils.subtract;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.itsspringboot.model.Stat;
 import com.itsspringboot.model.Task;
+import com.itsspringboot.repository.StatRepository;
 import com.itsspringboot.repository.TaskDocumentRepository;
 import com.itsspringboot.repository.TaskRepository;
 import com.itsspringboot.service.EmailNotificationService;
@@ -27,16 +29,19 @@ public class TaskLoader {
   private TaskRepository taskRepository;
   private EmailNotificationService emailNotificationService;
   private FCMNotificationService fcmNotificationService;
+  private StatRepository statRepository;
 
   @Autowired
   public TaskLoader(final TaskDocumentRepository taskDocumentRepository,
                     final TaskRepository taskRepository,
                     final EmailNotificationService emailNotificationService,
-                    final FCMNotificationService fcmNotificationService) {
+                    final FCMNotificationService fcmNotificationService,
+                    final StatRepository statRepository) {
     this.taskDocumentRepository = taskDocumentRepository;
     this.taskRepository = taskRepository;
     this.emailNotificationService = emailNotificationService;
     this.fcmNotificationService = fcmNotificationService;
+    this.statRepository = statRepository;
   }
 
   @Scheduled(fixedRate = 30000)
@@ -49,6 +54,8 @@ public class TaskLoader {
 
     taskRepository.saveAll(tasksToSave);
     taskRepository.removeAll(tasksToRemove);
+
+    statRepository.save(new Stat(documentTasks.size(), tasksToSave.size(), tasksToRemove.size()));
 
     if (CollectionUtils.isNotEmpty(tasksToSave)) {
       final String newTasksNumbers = tasksToSave.stream().map(Task::getNumber).collect(joining(", "));
