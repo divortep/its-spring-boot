@@ -41,7 +41,7 @@ public class EmailNotificationService {
 
   private void sendMessage(final String to, final String subject, final String message) {
     final SimpleMailMessage msg = new SimpleMailMessage();
-    msg.setTo(to);
+    msg.setTo(to.split(","));
     msg.setSubject(subject);
     msg.setText(message);
     javaMailSenderFactory.get().send(msg);
