@@ -1,7 +1,11 @@
 package com.itsspringboot.repository.impl;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
+import com.google.common.collect.ImmutableList;
 import com.itsspringboot.model.AcceptedTask;
 import com.itsspringboot.model.Performer;
 import com.itsspringboot.model.Task;
@@ -12,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -55,6 +60,28 @@ public class TaskRepositoryImpl implements TaskRepository {
   }
 
   @Override
+  public List<AcceptedTask> getAcceptedTasks(final Date from, final Date to) {
+    final Criteria fromCriteria = from != null ? Criteria.where("acceptedDate").gte(from) : null;
+    final Criteria toCriteria = to != null ? Criteria.where("acceptedDate").lte(to) : null;
+
+    Query query;
+    if (fromCriteria != null && toCriteria != null) {
+      query = new Query().addCriteria(new Criteria().orOperator(fromCriteria, toCriteria));
+
+    } else if (fromCriteria != null) {
+      query = new Query().addCriteria(fromCriteria);
+
+    } else if (toCriteria != null) {
+      query = new Query().addCriteria(toCriteria);
+
+    } else {
+      return emptyList();
+    }
+
+    return unmodifiableList(mongoTemplate.find(query, AcceptedTask.class));
+  }
+
+  @Override
   public List<AcceptedTask> getAcceptedByMeOrWithMeTasks() {
     final String currentUserId = userService.getCurrentUser()
         .map(User::getId)
@@ -81,27 +108,22 @@ public class TaskRepositoryImpl implements TaskRepository {
   }
 
   @Override
-  public Optional<Task> save(final Task task) {
+  public <T extends Task> Optional<T> save(final T task) {
     return Optional.ofNullable(mongoTemplate.save(task));
   }
 
   @Override
-  public List<Task> saveAll(final List<Task> tasks) {
-    tasks.stream()
-        .map(Task::new)
-        .forEach(mongoTemplate::save);
-    return unmodifiableList(tasks);
+  public <T extends Task> List<T> saveAll(final List<T> tasks) {
+    return tasks.stream().map(mongoTemplate::save).collect(toImmutableList());
   }
 
   @Override
-  public void remove(final Task task) {
+  public <T extends Task> void remove(final T task) {
     mongoTemplate.remove(task);
   }
 
   @Override
-  public void removeAll(final List<Task> tasks) {
-    tasks.stream()
-        .map(Task::new)
-        .forEach(mongoTemplate::remove);
+  public <T extends Task> void removeAll(final List<T> tasks) {
+    tasks.stream().forEach(mongoTemplate::remove);
   }
 }

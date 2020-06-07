@@ -19,6 +19,12 @@ public class MailConfig {
   @Value("${aes.key}")
   private String aesKey;
 
+  @Value("${its.admin.email}")
+  private String adminEmail;
+
+  @Value("${its.admin.defaultPassword}")
+  private String adminPassword;
+
   private JavaMailSender mailSender;
 
   @Autowired
@@ -35,14 +41,16 @@ public class MailConfig {
     Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
         .filter(auth -> auth.getPrincipal() instanceof UserPrincipal)
         .map(auth -> (UserPrincipal) auth.getPrincipal())
-        .ifPresent(userPrincipal -> {
+        .ifPresentOrElse(userPrincipal -> {
           ((JavaMailSenderImpl) mailSender).setUsername(userPrincipal.getUser().getEmail());
-          ((JavaMailSenderImpl) mailSender).setPassword(extractPassword(userPrincipal.getPassword()));
+          ((JavaMailSenderImpl) mailSender).setPassword(extractPassword(userPrincipal.getUser().getAppPwd()));
+        }, () -> { // for scheduled tasks
+          ((JavaMailSenderImpl) mailSender).setUsername(adminEmail);
+          ((JavaMailSenderImpl) mailSender).setPassword(extractPassword(adminPassword));
         });
 
     return mailSender;
   }
-
 
   private String extractPassword(final String passwordStr) {
     try {
