@@ -26,8 +26,8 @@ public class TaskDocumentRepositoryImpl implements TaskDocumentRepository {
 
   private final static Logger logger = LoggerFactory.getLogger(TaskDocumentRepositoryImpl.class);
   private final static String TASKS_BLOCK_REGEXP = "\"s\":\"(.*?)\"";
-  private final static String TASK_REGEXP = "(LDN.*?(\\n{2}|(?=LDN)))";
-  private final static String TASK_HEADER_REGEXP = "LDN.*\n";
+  private final static String TASK_HEADER_REGEXP = "LDN\\s\\w\\d+\\s\\([\\w\\d]+\\)";
+  private final static String TASK_REGEXP = "(" + TASK_HEADER_REGEXP + ".*?(\\n{2}|(?=LDN)))";
   private final static String SPECIAL_CHARS_REGEXP = "\u0011";
 
   @Value("${its.document.url}")
